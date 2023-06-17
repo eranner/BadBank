@@ -1,22 +1,52 @@
-function Spa() {
-    return(
-        <HashRouter>
-            <NavBar/>
-            <UserContext.Provider value={{users: [{name: "Joe Montana", email: 'montanaScarlet&Gold@gmail.com', password: 'goat4', balance: '3000.00'}]}}>
-            <Route path='/' exact component={Home}></Route>
-            <Route path='/CreateAccount/' component={CreateAccount}></Route>
-            {/* <Route path='/login/' component={Login}></Route> */}
-            <Route path='/deposit/' component={Deposit}></Route>
-            <Route path='/withdraw' component={Withdraw}></Route>
-            {/* <Route path='/balance/' component={Balance}></Route> */}
-            <Route path='/alldata/' component={AllData}></Route>
-            </UserContext.Provider>
-        </HashRouter>
-    )
-}
+const express = require('express')
+const app = express();
+const cors = require('cors')
 
-ReactDOM.render(
-    <Spa />,
-    document.getElementById('root')
+app.use(express.static('public'))
+app.use(cors())
 
-)
+app.get('/account/create/:name/:email/:password', (req, res)=> {
+    res.send({
+        name: req.params.name,
+        email: req.params.email,
+        password: req.params.password
+    })
+})
+
+app.get('/account/login/:email/:password', (req,res)=>{
+    res.send({
+        email: req.params.email,
+        password: req.params.password
+    })
+})
+
+app.get('/account/deposit/:email/:deposit', (req,res)=>{
+    res.send({
+        email: req.params.email,
+        deposit: req.params.deposit
+    })
+})
+app.get('/account/withdraw/:email/:withdraw', (req,res)=>{
+    res.send({
+        email: req.params.email,
+        withdraw: req.params.withdraw
+    })
+})
+
+app.get('/account/balance/:email/:balance', (req,res)=>{
+    res.send({
+        email: req.params.email,
+        balance: req.params.balance
+    })
+})
+app.get('/account/all', (req,res)=> {
+    res.send({
+        name: "Eric",
+        email: "eric@mit.edu",
+        password: 'secret123'
+    })
+})
+
+app.listen(3000, (req, res)=> {
+    console.log('Running on port 3000!')
+})
