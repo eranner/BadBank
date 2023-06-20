@@ -13,8 +13,17 @@ var name = 'user' + Math.floor(Math.random() *10000)
 var email = name + '@mit.edu'
 var collection = db.collection('customers')
 var doc = {name, email}
-collection.insertOne(doc, {w:1}, function (err, result){
+collection.insertOne(doc, {writeConcern:1}, function (err, result){
     console.log("Document inserted!")
 })
 
+
+var customers = db
+  .collection('customers')
+  .find()
+  .toArray(function(err, docs){
+    console.log('Collection', docs)
+
+    client.close();
+  })
 });

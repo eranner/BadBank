@@ -37,7 +37,15 @@ function CreateAccount(){
         if (!validate(name, 'name')) return;
         if (!validate(email, 'email')) return;
         if (!validate(password, 'password'))  return;
-        ctx.users.push({name, email, password, balance:'100.00'})
+        const url = `/account/create/${String(name)}/${String(email)}/${String(password)}`;
+
+        (async()=> {
+            let res = await fetch(url)
+            let data = await res.json()
+            console.log(data)
+        })
+        ();
+        // ctx.users.push({name, email, password, balance:'100.00'})
         // setShow(false)
         clearForm()
         setCreated("Add Another Account")
@@ -47,7 +55,7 @@ function CreateAccount(){
         }, 200)
 
     }
-    const ctx = React.useContext(UserContext)
+    // const ctx = React.useContext(UserContext)
 
     return(
       <Card

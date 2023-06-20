@@ -1,7 +1,16 @@
 function AllData(){
-    const ctx = React.useContext(UserContext)
-    const profiles = [...ctx.users]
-    console.log(profiles)
+    const [data, setData] = React.useState('')
+
+    React.useEffect(()=> {
+      fetch('/account/all')
+        .then(response => response.json())
+        .then(data => {
+          console.log(data)
+          setData(JSON.stringify(data))
+        })
+    })
+    // const profiles = [...ctx.users]
+    // console.log(profiles)
     return(
         <>
         <h1>ALL DATA<br/>
@@ -19,13 +28,14 @@ function AllData(){
   </thead>
   <tbody>
    
-        { profiles.map((profile) => 
+        {/* { data.map((profile) =>  */}
              <tr>
-                <td>{profile.name}</td>
+             <td>{data}</td>
+                {/* <td>{profile.name}</td>
                 <td>{profile.email}</td>
-                <td>{profile.password}</td>
+                <td>{profile.password}</td> */}
             </tr>
-        )}
+        {/* )} */}
 
     
   </tbody>

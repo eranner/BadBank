@@ -1,17 +1,52 @@
 function Login(){
-    const ctx = React.useContext(UserContext)
     const useEffect = React.useEffect
     const [show, setShow] = React.useState(true)
-    const [status, setStatus] = React.useState('')
+    // const [status, setStatus] = React.useState('loggedOut')
     const [email, setEmail] = React.useState('')
     const [password, setPassword] = React.useState('')
-    console.log(ctx)
+    // const {checkLoggedIn} = require('../auth.js')
+    // checkIfLoggedIn()
+    // if(status === 'loggedOut'){
+    //     checkIfLoggedIn();
+    // }
+
+    useEffect(() => {
+        checkIfLoggedIn();
+      }, []);
+    // console.log(ctx)/
+    // const isLoggedIn = checkLoggedIn();
+    // console.log(checkLoggedIn())
     function handleLogin() {
-        if(email === ctx.users[0].email && password === ctx.users[0].password){
-            console.log('success')
-            clearForm()
+        const url = `/account/login/${encodeURIComponent(email)}/${encodeURIComponent(password)}`;
+        
+        (async () => {
+          try {
+            const res = await fetch(url);
+            if (res.status === 200) {
+              const data = await res.json();
+              console.log(data.token);
+              localStorage.setItem("token", data.token)
+              localStorage.setItem("name", data.name)
+              localStorage.setItem("balance", data.balance)
+        checkIfLoggedIn()
+        // setStatus('loggedIn')
+
+              // Save the token or perform any other action
+            } else {
+              console.log('Login failed:', res.statusText);
+            }
+          } catch (error) {
+            console.error('An error occurred during login:', error);
+          }
+        })();
+      }
+      
+    function checkIfLoggedIn(){
+        if(localStorage.getItem("token")){
+            console.log("yes")
+            setShow(false)
         } else {
-            console.log('failed')
+            setShow(true)
         }
     }
     function clearForm(){
@@ -40,7 +75,7 @@ function Login(){
             </>
         ): (
             <>
-            <h5>Welcome back {ctx.users[0].name}!</h5>
+            {/* <h5>Welcome back {ctx.users[0].name}!</h5> */}
             <p>How can we help you?</p>
             <a href="#/deposit/"><button type='submit' className='btn btn-success'  style={{marginBottom:"10px"}}>Make A Deposit</button></a>            
             <a href="#/withdraw/"><button type='submit' className='btn btn-warning' style={{marginBottom:"10px"}} >Make A Withdraw</button></a>

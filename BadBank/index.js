@@ -1,50 +1,65 @@
 const express = require('express')
 const app = express();
 const cors = require('cors')
+const dal = require('./dal.js')
+// const { checkLoggedIn } = require('./auth.js')
+
+
+
+
 
 app.use(express.static('public'))
 app.use(cors())
 
-app.get('/account/create/:name/:email/:password', (req, res)=> {
-    res.send({
-        name: req.params.name,
-        email: req.params.email,
-        password: req.params.password
-    })
-})
 
-app.get('/account/login/:email/:password', (req,res)=>{
-    res.send({
-        email: req.params.email,
-        password: req.params.password
-    })
+app.get('/account/create/:name/:email/:password', (req, res)=> {
+    dal.create(req.params.name, req.params.email, req.params.password).
+            then((user) => {
+            console.log(user)
+            res.send(user)
+        })
 })
+app.get('/account/login/:email/:password', (req, res) => {
+    dal.checkLogin(req.params.email, req.params.password)
+      .then((token) => {
+        res.send({ token });
+      })
+      .catch((error) => {
+        console.error('Login failed:', error);
+        res.status(401).send({ error: 'Login failed' });
+      });
+  });
+  
 
 app.get('/account/deposit/:email/:deposit', (req,res)=>{
-    res.send({
-        email: req.params.email,
-        deposit: req.params.deposit
-    })
+    dal.all()
+        .then((docs)=> {
+            console.log(docs)
+            res.send(docs)
+        })
 })
 app.get('/account/withdraw/:email/:withdraw', (req,res)=>{
-    res.send({
-        email: req.params.email,
-        withdraw: req.params.withdraw
-    })
+    dal.all()
+        .then((docs)=> {
+            console.log(docs)
+            res.send(docs)
+        })
 })
 
 app.get('/account/balance/:email/:balance', (req,res)=>{
-    res.send({
-        email: req.params.email,
-        balance: req.params.balance
-    })
+    dal.all()
+        .then((docs)=> {
+            console.log(docs)
+            res.send(docs)
+        })
 })
 app.get('/account/all', (req,res)=> {
-    res.send({
-        name: "Eric",
-        email: "eric@mit.edu",
-        password: 'secret123'
-    })
+    dal.all()
+        .then((docs)=> {
+            console.log(docs)
+            res.send(docs)
+        })
+
 })
 
 app.listen(3000, (req, res)=> {
