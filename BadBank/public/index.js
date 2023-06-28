@@ -1,8 +1,18 @@
 function Spa() {
+    const [userName, setUsername] = React.useState(null)
+    const [userBalance, setUserBalance] = React.useState(null)
+    const [isLoggedIn, setIsLoggedIn] = React.useState(false)
+    const [userEmail, setUserEmail] = React.useState(null)
+
+    function logOut() {
+        localStorage.clear()
+        location.assign('/')
+    }
+
     return(
         <HashRouter>
+            <UserContext.Provider value={{userName, setUsername, userBalance, setUserBalance, isLoggedIn, setIsLoggedIn, logOut, userEmail, setUserEmail}}>
             <NavBar/>
-            <UserContext.Provider value={{users: [{name: "Joe Montana", email: 'montanaScarlet&Gold@gmail.com', password: 'goat4', balance: '3000.00'}]}}>
             <Route path='/' exact component={Home}></Route>
             <Route path='/CreateAccount/' component={CreateAccount}></Route>
             <Route path='/login/' component={Login}></Route>

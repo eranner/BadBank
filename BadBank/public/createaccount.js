@@ -6,7 +6,34 @@ function CreateAccount(){
     const [password, setPassword] = React.useState('')
     const [created, setCreated] = React.useState('CREATE ACCOUNT')
     const [disabled, setDisabled] = React.useState(true)
+    const useEffect = React.useEffect
+    const {userName, setUsername }= React.useContext(UserContext)
+    const { userBalance, setUserBalance }= React.useContext(UserContext)
+    const { isLoggedIn, setIsLoggedIn }= React.useContext(UserContext)
 
+    function checkIfLoggedIn(){
+        if(localStorage.getItem("token")){
+            // console.log("yes")
+            // setIsLoggedIn(true)
+            // setShow(false)
+            const firstLoginCheck = JSON.parse(localStorage.getItem("loggedIn"))
+            setIsLoggedIn(firstLoginCheck)
+            // console.log(userName)
+        } else {
+            setShow(true)
+        }
+    }
+    useEffect(() => {
+        checkIfLoggedIn();
+        if(isLoggedIn == true){
+          const newUserName = window.localStorage.getItem('token')
+          const parsedUserInfo = JSON.parse(newUserName)
+          // console.log(parsedUserInfo.userName)
+          setUsername(parsedUserInfo.userName)
+          setUserBalance(parsedUserInfo.userBalance.toFixed(2))
+          // console.log(userName)
+        }
+      }, [isLoggedIn]);
     function validate(field, label){
         if (!field) {
             setStatus('Error '+ label)
@@ -33,7 +60,7 @@ function CreateAccount(){
     }
 
     const handleCreate = () =>{
-        console.log(name, email, password)
+        // console.log(name, email, password)
         if (!validate(name, 'name')) return;
         if (!validate(email, 'email')) return;
         if (!validate(password, 'password'))  return;
@@ -42,7 +69,7 @@ function CreateAccount(){
         (async()=> {
             let res = await fetch(url)
             let data = await res.json()
-            console.log(data)
+            // console.log(data)
         })
         ();
         // ctx.users.push({name, email, password, balance:'100.00'})

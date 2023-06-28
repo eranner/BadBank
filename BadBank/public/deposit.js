@@ -4,18 +4,40 @@ function Deposit(){
     const [status, setStatus] = React.useState('')
     const [deposit, setDeposit] = React.useState('')
     const [disabled, setDisabled] = React.useState(true)
-    // const [email, setEmail] = React.useState('')
-    // const [password, setPassword] = React.useState('')
-    const ctx = React.useContext(UserContext)
-   // console.log([...ctx.users])
+    const { isLoggedIn, setIsLoggedIn }= React.useContext(UserContext)
+    const {userBalance, setUserBalance} = React.useContext(UserContext)
+    const {userName, setUsername} = React.useContext(UserContext)
+    const { userEmail, setUserEmail } = React.useContext(UserContext)
+    const updateBalance = JSON.parse(localStorage.getItem("usersBalance"))
 
+    function loginStatusCheck () {
+        if(localStorage.getItem('loggedIn')){
+            const updatedLogin = JSON.parse(localStorage.getItem("loggedIn"))
+            //   console.log("value of localStorage loggedIn" + updatedLogin)
+              setIsLoggedIn(updatedLogin)
+              const newUserName = window.localStorage.getItem('token')
+              const parsedUserInfo = JSON.parse(newUserName)
+            //   console.log(parsedUserInfo.userName)
+            //   console.log(parsedUserInfo.userEmail)
+              setUsername(parsedUserInfo.userName)
+              setUserBalance(updateBalance)
+              setUserEmail(parsedUserInfo.userEmail)
+        }
+    }
+
+    function balanceCheck() {
+        setUserBalance(updateBalance)
+    }
+
+useEffect(()=> {
+    loginStatusCheck();
+},[])
    useEffect(()=> {
-
-    console.log(deposit)
-    // validate(deposit)
+    balanceCheck();
+    // console.log(deposit)
    }, [deposit])
 
-    console.log(deposit)
+    // console.log(deposit)
     function validate(field, label){
         if (!field) {
            
@@ -24,11 +46,7 @@ function Deposit(){
             setTimeout(() => setStatus(''), 3000) 
             return false; 
         }
-        // if (field > ctx.users[0].balance){
-        //     setStatus("You do not have the sufficient funds to withdraw. Please try again")
-        //     setTimeout(() => setStatus(''), 3000) 
-        //     return false
-        // }
+
         if (field < 0){
             setStatus(`Please enter positive numbers only`)
             setTimeout(() => setStatus(''), 3000) 
@@ -44,13 +62,6 @@ function Deposit(){
         setDeposit('')
     }
 
-    // function checkForLetter(e){
-    //     if(e.currentTarget.value <= '0' || e.currentTarget.value >= '9'){
-    //         alert("Please enter numeric values only")
-    //         setDeposit()
-    //     } else return
-    //     console.log(e.currentTarget.value)
-    // }
     function clearForm(){
         setDeposit('')
         setShow(true)
@@ -58,32 +69,34 @@ function Deposit(){
 
     }
     const handleDeposit = () =>{
-        // console.log(name, email, password)
+
         if (!validate(deposit, 'Please enter a deposit amount')) return;
-        // if (!validate(email, 'email')) return;
-        // if (!validate(password, 'password'))  return;
-        // ctx.users.push({name, email, password, balance:100})
 
         setShow(false)
-        console.log(deposit)
-        console.log(typeof deposit)
-        let total = ctx.users[0].balance
-        let number = parseFloat(total).toFixed(2)
-        let parsedNum = parseFloat(number)
-        let newDeposit = parseFloat(deposit).toFixed(2)
-        let parsedNewDeposit = parseFloat(newDeposit)
-        parsedNum = parsedNum + parsedNewDeposit
-        let finalDep = parseFloat(parsedNum).toFixed(2)
-        console.log(number)
-        ctx.users[0].balance= finalDep
-        console.log(ctx.users[0].balance)
-    }
-// function checkNumber(character){
-//     if(character <'0'|| character >'9' || character<0 || character >9){
-//         alert('nope')
-//     }
-// }
 
+        // console.log(deposit);
+        const url = `/account/deposit/${userEmail}/${deposit}`;
+        (async () => {
+            try {
+              const res = await fetch(url, {
+                method: 'POST'
+              });
+              if (res.status === 200) {
+                const data = await res.json();
+                // console.log(data);
+                localStorage.setItem("usersBalance", JSON.stringify(data.balance))
+                setUserBalance(data.balance)
+              } else {
+                console.log('Login failed:', res.statusText);
+  
+              }
+            } catch (error) {
+              console.error('An error occurred during deposit:', error);
+            }
+          })();
+        
+    }
+if(localStorage.getItem('token')){
     return(
         <Card
         bgcolor='success'
@@ -93,8 +106,8 @@ function Deposit(){
             <>
 
 <div style={{display: 'flex', gap: 20, justifyContent: 'space-between'}}>
-            <h3 style={{ textShadow: '1px 1px #333'}}>Balance:</h3>
-            <h3 style={{textShadow: '1px 1px #333', textAlign: 'right'}}>${ctx.users[0].balance}</h3>
+            <h3 style={{ textShadow: '1px 1px #333'}}>{userName}'s Balance:</h3>
+            <h3 style={{textShadow: '1px 1px #333', textAlign: 'right'}}>${userBalance}</h3>
             </div>
 
             <br/>
@@ -104,10 +117,6 @@ function Deposit(){
             <div style={{display: 'flex', justifyContent: 'center'}}>
             <button type='submit' className='btn btn-dark' disabled={disabled} onClick={handleDeposit} style={{ fontSize: '2.5rem'}}>Deposit</button>
             </div>
-
-
-            {/* <input type='number' className="form-control" id='deposit' min='0'value={deposit}onChange={e=> setDeposit(e.currentTarget.value)}/><br/>
-            <button type='submit' className='btn btn-dark' onClick={handleDeposit}>Deposit</button> */}
             </>
         ): (
             <>
@@ -118,4 +127,7 @@ function Deposit(){
       
       />
     )
+} else {
+    window.location.assign('/')
+}
 }

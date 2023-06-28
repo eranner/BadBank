@@ -1,12 +1,43 @@
 function Withdraw(){   
+    const useEffect = React.useEffect
     const [show, setShow] = React.useState(true)
     const [status, setStatus] = React.useState('')
     const [withdraw, setWithdraw] = React.useState('')
     const [disabled, setDisabled] = React.useState(true)
-    // const [email, setEmail] = React.useState('')
-    // const [password, setPassword] = React.useState('')
-    const ctx = React.useContext(UserContext)
-   // console.log([...ctx.users])
+    const { isLoggedIn, setIsLoggedIn }= React.useContext(UserContext)
+    const {userBalance, setUserBalance} = React.useContext(UserContext)
+    const {userName, setUsername} = React.useContext(UserContext)
+    const { userEmail, setUserEmail } = React.useContext(UserContext)
+    const updateBalance = JSON.parse(localStorage.getItem("usersBalance"))
+
+    function loginStatusCheck () {
+        if(localStorage.getItem('loggedIn')){
+            const updatedLogin = JSON.parse(localStorage.getItem("loggedIn"))
+            //   console.log("value of localStorage loggedIn" + updatedLogin)
+              setIsLoggedIn(updatedLogin)
+              const newUserName = window.localStorage.getItem('token')
+              const parsedUserInfo = JSON.parse(newUserName)
+            //   console.log(parsedUserInfo.userName)
+            //   console.log(parsedUserInfo.userEmail)
+              setUsername(parsedUserInfo.userName)
+              setUserBalance(updateBalance)
+              setUserEmail(parsedUserInfo.userEmail)
+        }
+    }
+
+    function balanceCheck() {
+        setUserBalance(updateBalance)
+    }
+
+useEffect(()=> {
+    loginStatusCheck();
+},[])
+   useEffect(()=> {
+    balanceCheck();
+    // console.log(withdraw)
+   }, [withdraw])
+
+    // console.log(withdraw)
  
     function validate(field, label){
         if (!field) {
@@ -20,7 +51,7 @@ function Withdraw(){
             setTimeout(()=> setStatus(''), 3000)
             return false
         }
-        if (parseFloat(field) > ctx.users[0].balance){
+        if (parseFloat(field) > updateBalance){
             setStatus("Transaction Failed")
             setTimeout(() => setStatus(''), 3000) 
             return false
@@ -47,23 +78,32 @@ function Withdraw(){
 
     }
     const handleWithdraw = () =>{
-        
-        // console.log(name, email, password)
         if (!validate(withdraw, 'Please enter an amount to withdraw')) return;
-        // if (!validate(email, 'email')) return;
-        // if (!validate(password, 'password'))  return;
-        // ctx.users.push({name, email, password, balance:100})
-        setShow(false)
-        let total = ctx.users[0].balance
-        let number = parseFloat(total).toFixed(2)
-        let newWithdraw = parseFloat(withdraw).toFixed(2)
-        number = number - newWithdraw
-        let finalNum = parseFloat(number).toFixed(2)
-        console.log(number)
-        ctx.users[0].balance= finalNum
-        console.log(ctx.users[0].balance)
-    }
 
+        const url = `/account/withdraw/${userEmail}/${withdraw}`;
+        (async () => {
+            try {
+              const res = await fetch(url, {
+                method: 'POST'
+              });
+              if (res.status === 200) {
+                const data = await res.json();
+                // console.log(data);
+                localStorage.setItem("usersBalance", JSON.stringify(data.balance))
+                setUserBalance(data.balance)
+
+              } else {
+                console.log('Login failed:', res.statusText);
+  
+              }
+            } catch (error) {
+              console.error('An error occurred during deposit:', error);
+            }
+          })();
+        setShow(false)
+
+    }
+if(localStorage.getItem('token')){
     return(
     
 
@@ -74,8 +114,8 @@ function Withdraw(){
         body = {show ? (
             <>
             <div style={{display: 'flex', gap: 20, justifyContent: 'space-between'}}>
-            <h3 style={{ textShadow: '1px 1px #333'}}>Balance:</h3>
-            <h3 style={{textShadow: '1px 1px #333', textAlign: 'right'}}>${ctx.users[0].balance}</h3>
+            <h3 style={{ textShadow: '1px 1px #333'}}>{userName}'s Balance:</h3>
+            <h3 style={{textShadow: '1px 1px #333', textAlign: 'right'}}>${updateBalance}</h3>
             </div>
             
             <br/>
@@ -97,4 +137,7 @@ function Withdraw(){
       />
       
     )
+        }else {
+            window.location.assign('/')
+        }
 }

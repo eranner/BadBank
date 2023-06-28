@@ -4,6 +4,8 @@ const HashRouter = ReactRouterDOM.HashRouter
 const UserContext = React.createContext(null)
 const NavLink = ReactRouterDOM.NavLink
 
+
+// const [userInfo, setUserInfo] = React.useState({name: "", email:"", password: "", balance: 0})
 function Card(props){
     function classes(){
         const bg = props.bgcolor ? ' bg-' + props.bgcolor : ' ';

@@ -21,6 +21,61 @@ function create(name, email, password){
     })
 }
 
+
+// function makeDeposit(email, deposit) {
+//   return new Promise((resolve, reject) => {
+//     const collection = db.collection('users');
+//     collection.updateOne(
+//       { email: email },
+//       { $inc: { balance: deposit } },
+//       (err, result) => {
+//         if (err) {
+//           reject(err);
+//         } else {
+//           resolve(result);
+//         }
+//       }
+//     );
+//   });
+// }
+
+
+function makeDeposit(email, deposit) {
+  return new Promise((resolve, reject) => {
+    const collection = db.collection('users');
+    collection.findOneAndUpdate(
+      { email: email },
+      { $inc: { balance: deposit } },
+      { returnOriginal: false },
+      (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result.value);
+        }
+      }
+    );
+  });
+}
+
+function makeWithdraw(email, withdraw) {
+  return new Promise((resolve, reject) => {
+    const collection = db.collection('users');
+    collection.findOneAndUpdate(
+      { email: email },
+      { $inc: { balance: withdraw } },
+      { returnOriginal: false },
+      (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result.value);
+        }
+      }
+    );
+  });
+}
+
 function all() {
     return new Promise((resolve, reject) => {
         const customers = db
@@ -40,10 +95,9 @@ function checkLogin(email, password) {
         if (error) {
           reject(error);
         } else if (user) {
-          const username = user.name
-          const balance = user.balance  
+          const { name: userName, balance: userBalance, email: userEmail, password: userPassword } = user;
           const token = jwt.sign({ email: user.email }, 'secretKey', { expiresIn: '1h' });
-          resolve({token});
+          resolve({token, userName, userBalance, userEmail, userPassword});
         } else {
           reject(new Error('Login failed'));
         }
@@ -76,19 +130,21 @@ function checkLogin(email, password) {
 //     }
 //   }
 
-function makeDeposit(){
-    return new Promise((resolve, reject) => {
-        const customers = db
-        .collection('users')
-        .find({})
-        .toArray(function(err, docs) {
-            err ? reject(err) : resolve(docs)
-        })
-    })
-    // return new Promise((resolve, reject)=>{
-    //     const collection = db.collection('users')
-    //     const doc = {email, deposit}
-    //     collection.update({balance: balance + deposit})
-    // })
-}
-module.exports = {create, all, checkLogin}
+// function makeDeposit(email, deposit){
+//     // return new Promise((resolve, reject) => {
+//     //     const customers = db
+//     //     .collection('users')
+//     //     .find({})
+//     //     .toArray(function(err, docs) {
+//     //         err ? reject(err) : resolve(docs)
+//     //     })
+//     // })
+//     return new Promise((resolve, reject)=>{
+//         const collection = db.collection('users')
+//         const doc = {email, deposit}
+//         collection.update({balance: balance + deposit})
+//     })
+// }
+
+
+module.exports = {create, all, checkLogin, makeDeposit, makeWithdraw}

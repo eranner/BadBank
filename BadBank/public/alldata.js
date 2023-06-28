@@ -1,16 +1,42 @@
 function AllData(){
+  const useEffect = React.useEffect
+  const {userBalance, setUserBalance} = React.useContext(UserContext)
+  const {userName, setUsername} = React.useContext(UserContext)
+  const { userEmail, setUserEmail } = React.useContext(UserContext)
+  const updateBalance = JSON.parse(localStorage.getItem("usersBalance"))
+  const { isLoggedIn, setIsLoggedIn }= React.useContext(UserContext)
     const [data, setData] = React.useState('')
+    function loginStatusCheck () {
+      if(localStorage.getItem('loggedIn')){
+          const updatedLogin = JSON.parse(localStorage.getItem("loggedIn"))
+            // console.log("value of localStorage loggedIn" + updatedLogin)
+            setIsLoggedIn(updatedLogin)
+            const newUserName = window.localStorage.getItem('token')
+            const parsedUserInfo = JSON.parse(newUserName)
+            // console.log(parsedUserInfo.userName)
+            // console.log(parsedUserInfo.userEmail)
+            setUsername(parsedUserInfo.userName)
+            setUserBalance(updateBalance)
+            setUserEmail(parsedUserInfo.userEmail)
+      }
+  }
 
-    React.useEffect(()=> {
+useEffect(()=> {
+  loginStatusCheck();
+},[])
+    useEffect(()=> {
       fetch('/account/all')
         .then(response => response.json())
         .then(data => {
-          console.log(data)
+          // console.log(data)
           setData(JSON.stringify(data))
         })
     })
     // const profiles = [...ctx.users]
     // console.log(profiles)
+    if(localStorage.getItem('token')){
+    
+    
     return(
         <>
         <h1>ALL DATA<br/>
@@ -20,9 +46,9 @@ function AllData(){
         <table className="table table-dark table-striped">
   <thead>
     <tr>
-      <th scope="col">Email</th>
-      <th scope="col">Name</th>
-      <th scope="col">Password</th>
+      <th scope="col">All User Data</th>
+      {/* <th scope="col">Name</th>
+      <th scope="col">Password</th> */}
     
     </tr>
   </thead>
@@ -45,4 +71,7 @@ function AllData(){
         </>
 
     )
+}  else {
+window.location.assign('/')
+}
 }

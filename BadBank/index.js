@@ -31,19 +31,42 @@ app.get('/account/login/:email/:password', (req, res) => {
   });
   
 
-app.get('/account/deposit/:email/:deposit', (req,res)=>{
-    dal.all()
-        .then((docs)=> {
-            console.log(docs)
-            res.send(docs)
-        })
+// app.post('/account/deposit/:email/:deposit', (req,res)=>{
+//     const newDeposit = parseFloat(req.params.deposit);
+
+//     dal.makeDeposit(req.params.email, newDeposit)
+//         .then((doc)=> {
+//             // console.log(doc)
+//             res.send({doc})
+//         }).catch((error) => {
+//             console.error('Login failed:', error);
+//             res.status(401).send({ error: 'Deposit failed' });
+//           });
+// })
+
+app.post('/account/deposit/:email/:deposit', (req,res)=>{
+    const parsedDeposit = parseFloat(req.params.deposit).toFixed(2) * -1;
+    const newDeposit = (parsedDeposit * -1)
+
+    dal.makeDeposit(req.params.email, newDeposit)
+        .then((doc)=> {
+            res.send({ balance: doc.balance }); // Sending the updated balance
+        }).catch((error) => {
+            console.error('Deposit failed:', error);
+            res.status(401).send({ error: 'Deposit failed' });
+          });
 })
-app.get('/account/withdraw/:email/:withdraw', (req,res)=>{
-    dal.all()
-        .then((docs)=> {
-            console.log(docs)
-            res.send(docs)
-        })
+app.post('/account/withdraw/:email/:withdraw', (req,res)=>{
+    const parsedWithdraw = parseFloat(req.params.withdraw).toFixed(2);
+    const newWithdraw = (parsedWithdraw * -1)
+
+    dal.makeWithdraw(req.params.email, newWithdraw)
+        .then((doc)=> {
+            res.send({ balance: doc.balance }); // Sending the updated balance
+        }).catch((error) => {
+            console.error('Deposit failed:', error);
+            res.status(401).send({ error: 'Deposit failed' });
+          });
 })
 
 app.get('/account/balance/:email/:balance', (req,res)=>{
